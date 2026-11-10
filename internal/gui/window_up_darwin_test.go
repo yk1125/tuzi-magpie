@@ -21,6 +21,7 @@ import (
 // it is open too; closed by magpie, it isn't.
 func TestCoveredWindowStaysUp(t *testing.T) {
 	out, err := runAppKit(t, 30*time.Second, []string{"MAGPIE_TEST_WINDOW_UP=1"})
+	t.Logf("%s", out)
 	if err != nil || !strings.Contains(string(out), "window up: ok") {
 		t.Fatalf("window up: %v\n%s", err, out)
 	}
@@ -81,7 +82,16 @@ func init() {
 				cover.SetPosition(x-100, y-100)
 				cover.Show()
 			})
-			waitFor("the cover hides the window from view", func() bool { return !h.main.IsVisible() })
+			waitFor("the cover hides the window from view", func() bool {
+				if h.main.IsVisible() {
+					x, y := h.main.Position()
+					wd, ht := h.main.Size()
+					cx, cy := cover.Position()
+					cw, ch := cover.Size()
+					fmt.Printf("geometry main %d,%d %dx%d cover %d,%d %dx%d visible=%v\n", x, y, wd, ht, cx, cy, cw, ch, cover.IsVisible())
+				}
+				return !h.main.IsVisible()
+			})
 			expect("covered", true)
 			application.InvokeSync(func() { cover.Close() })
 

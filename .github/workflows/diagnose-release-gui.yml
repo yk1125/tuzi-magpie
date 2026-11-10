@@ -1,0 +1,15 @@
+name: Diagnose release GUI
+on:
+  push:
+    branches: [codex/diagnose-release-gui]
+permissions:
+  contents: read
+jobs:
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: scripts/tuzi-magpie/isolated.sh go test -v -count=1 -timeout=2m ./internal/gui -run '^TestCoveredWindowStaysUp$'
