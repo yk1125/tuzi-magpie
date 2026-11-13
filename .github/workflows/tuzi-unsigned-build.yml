@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           # Pin application source; this branch only selects available runners.
-          ref: 45f508a4341350402802ccaf9192a6ad031a3687
+          ref: 9e0ff8527142cf7429e7a9d9dd4da92d6a2ea373
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
