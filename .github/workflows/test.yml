@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15]
+        os: [macos-15-intel]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -101,7 +101,10 @@ jobs:
         shell: bash
         run: |
           go test -race -c -o "$RUNNER_TEMP/gateway.race" -tags "${{ steps.tags.outputs.tags }}" ./internal/gateway/
-          build/race-shards.sh internal/gateway "$RUNNER_TEMP/gateway.race" "$(getconf _NPROCESSORS_ONLN)" -test.timeout=20m
+          # The throughput fixture has a 75s client limit. Run it alone,
+          # then run every other test with enough total time on Intel hosts.
+          (cd internal/gateway && "$RUNNER_TEMP/gateway.race" -test.run '^TestPluginStreamLongActiveReader$' -test.timeout=5m)
+          build/race-shards.sh internal/gateway "$RUNNER_TEMP/gateway.race" "$(getconf _NPROCESSORS_ONLN)" -test.skip '^TestPluginStreamLongActiveReader$' -test.timeout=45m
           go test -race -tags "${{ steps.tags.outputs.tags }}" ./internal/redact/
 
       # Account usage mixes cached results with concurrent fetches.
