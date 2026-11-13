@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-latest
+          - runner: macos-15-intel
             platform: macos
             arch: arm64
           - runner: macos-15-intel
@@ -41,6 +41,9 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Pin application source; this branch only selects available runners.
+          ref: 45f508a4341350402802ccaf9192a6ad031a3687
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
